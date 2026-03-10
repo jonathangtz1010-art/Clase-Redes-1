@@ -1,78 +1,105 @@
-import socket
-import serial
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
-# --- CONFIGURACIÓN ---
-SERIAL_PORT = "/dev/ttyACM0"
-BAUDRATE    = 9600
+import socket
+import signal
+import time
+import threading
+import serial
 
 HOST = "0.0.0.0"
 PORT = 5001
-# ----------------------
 
-def parse_cmd(cmd: str):
-    cmd = cmd.strip().upper()
+BAUD = 115200
+SERIAL_PORT = "/dev/ttyACM0"
 
-    if not cmd.startswith("LED"):
-        return (False, None)
+_running = True
+_lock = threading.Lock()
 
-    if len(cmd) < 6:  # mínimo "LED1:0"
-        return (False, None)
+def handle_sig(*_):
+    global _running
+    _running = False
 
-    led_char = cmd[3:4]
-    if led_char not in ("1", "2", "3", "4"):
-        return (False, None)
+def open_serial():
+    ser = serial.Serial(SERIAL_PORT, BAUD, timeout=2)
+    time.sleep(2.0)
+    ser.reset_input_buffer()
+    ser.reset_output_buffer()
+    print(f"[SERIAL] Conectado a {SERIAL_PORT} @ {BAUD}")
+    return ser
 
-    if ":" not in cmd:
-        return (False, None)
+def read_line(ser):
+    return ser.readline().decode("utf-8", errors="ignore").strip()
 
-    parts = cmd.split(":", 1)
-    if len(parts) != 2:
-        return (False, None)
+def send_to_arduino(ser, cmd):
+    ser.write((cmd.strip() + "\n").encode("utf-8"))
+    ser.flush()
+    resp = read_line(ser)
+    return resp if resp else "ERR sin_respuesta_del_arduino"
 
-    try:
-        val = int(parts[1])
-    except:
-        return (False, None)
+def normalize_command(msg):
+    msg = msg.strip().upper()
 
-    if val < 0: val = 0
-    if val > 255: val = 255
+    if msg in ("", "GET", "READ", "STATUS"):
+        return "STATUS"
 
-    return (True, f"LED{led_char}:{val}")
+    if msg == "PING":
+        return "PING"
+
+    return "STATUS"
 
 def main():
-    ser = serial.Serial(SERIAL_PORT, BAUDRATE, timeout=1)
-    ser.reset_input_buffer()
+    global _running
+    signal.signal(signal.SIGINT, handle_sig)
+    signal.signal(signal.SIGTERM, handle_sig)
 
-    print(f"Conectado a Arduino en {SERIAL_PORT} a {BAUDRATE} baudios")
-    print(f"Servidor LED2 escuchando en {HOST}:{PORT}...")
+    ser = open_serial()
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         s.bind((HOST, PORT))
         s.listen(5)
+        s.settimeout(0.5)
 
-        while True:
-            conn, addr = s.accept()
+        print(f"[TCP] Escuchando en {HOST}:{PORT}")
+
+        while _running:
+            try:
+                conn, _ = s.accept()
+            except socket.timeout:
+                continue
+
             with conn:
-                data = conn.recv(1024)
-                if not data:
-                    continue
+                conn.settimeout(1.0)
+                data = b""
 
-                raw = data.decode("utf-8", errors="ignore").strip()
-                ok, cmd = parse_cmd(raw)
+                try:
+                    while True:
+                        chunk = conn.recv(1024)
+                        if not chunk:
+                            break
+                        data += chunk
+                        if b"\n" in data:
+                            break
+                except socket.timeout:
+                    pass
 
-                if not ok:
-                    conn.sendall(b"ERR:CMD\n")
-                    continue
+                msg = data.decode("utf-8", errors="ignore").strip()
+                cmd = normalize_command(msg)
 
-                ser.write((cmd + "\n").encode("utf-8"))
-                ser.flush()
+                try:
+                    with _lock:
+                        resp = send_to_arduino(ser, cmd)
+                    conn.sendall((resp + "\n").encode("utf-8"))
+                except Exception as e:
+                    conn.sendall((f"ERR {e}\n").encode("utf-8"))
 
-                resp = ser.readline().decode("utf-8", errors="ignore").strip()
-                if not resp:
-                    resp = "ERR:TIMEOUT"
+    try:
+        ser.close()
+    except Exception:
+        pass
 
-                conn.sendall((resp + "\n").encode("utf-8"))
+    print("Cerrado limpio.")
 
 if __name__ == "__main__":
     main()
