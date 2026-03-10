@@ -1,51 +1,88 @@
-// 4 LEDs con sliders (0-255) por Serial
-// Comandos: LED1:0-255, LED2:0-255, LED3:0-255, LED4:0-255
 
-const byte NLEDS = 4;
-const byte LED_PINS[NLEDS] = {3, 5, 6, 9};  // PWM UNO/Nano
-char buf[40];
+const int SENSOR_PIN = A0;
+const int UMBRAL = 500;
+const int HYSTERESIS = 15;
 
-void setup() {
-  Serial.begin(9600);
-  Serial.setTimeout(25);
+String bufferLine = "";
+bool activeState = false;
 
-  for (byte i = 0; i < NLEDS; i++) {
-    pinMode(LED_PINS[i], OUTPUT);
-    analogWrite(LED_PINS[i], 0);
+bool computeState(int value) {
+  if (activeState) {
+    if (value <= UMBRAL - HYSTERESIS) {
+      activeState = false;
+    }
+  } else {
+    if (value >= UMBRAL + HYSTERESIS) {
+      activeState = true;
+    }
+  }
+  return activeState;
+}
+
+void printStatus() {
+  int value = analogRead(SENSOR_PIN);
+  bool active = computeState(value);
+
+  Serial.print("OK ");
+  Serial.print("a0=");
+  Serial.print(value);
+
+  Serial.print(" threshold=");
+  Serial.print(UMBRAL);
+
+  Serial.print(" red=");
+  Serial.print(active ? 1 : 0);
+
+  Serial.print(" green=");
+  Serial.print(active ? 1 : 0);
+
+  Serial.print(" state=");
+  Serial.print(active ? "ACTIVO" : "REPOSO");
+
+  Serial.print(" mode=ANALOG");
+  Serial.print(" input=A0");
+  Serial.print(" leds=HARDWARE");
+  Serial.print(" driver=TRANSISTOR");
+  Serial.println();
+}
+
+void handleCommand(String cmd) {
+  cmd.trim();
+  cmd.toUpperCase();
+
+  if (cmd == "PING") {
+    Serial.println("OK pong");
+    return;
   }
 
-  Serial.println("OK:READY");
+  if (cmd == "GET" || cmd == "READ" || cmd == "STATUS") {
+    printStatus();
+    return;
+  }
+
+  Serial.println("ERR comando_no_valido");
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(250);
+  Serial.println("OK Arduino_A0_listo");
 }
 
 void loop() {
-  if (!Serial.available()) return;
+  int value = analogRead(SENSOR_PIN);
+  computeState(value);
 
-  int n = Serial.readBytesUntil('\n', buf, sizeof(buf) - 1);
-  buf[n] = '\0';
+  while (Serial.available() > 0) {
+    char c = (char)Serial.read();
 
-  while (n > 0 && (buf[n-1] == '\r' || buf[n-1] == ' ' || buf[n-1] == '\t')) {
-    buf[n-1] = '\0';
-    n--;
-  }
-
-  if (strncmp(buf, "LED", 3) == 0) {
-    int idx = buf[3] - '1';      // '1'..'4' -> 0..3
-    char *p = strchr(buf, ':');  // busca ':'
-
-    if (idx >= 0 && idx < NLEDS && p) {
-      int val = atoi(p + 1);
-      if (val < 0) val = 0;
-      if (val > 255) val = 255;
-
-      analogWrite(LED_PINS[idx], val);
-
-      Serial.print("OK:LED");
-      Serial.print(idx + 1);
-      Serial.print(":");
-      Serial.println(val);
-      return;
+    if (c == '\n' || c == '\r') {
+      if (bufferLine.length() > 0) {
+        handleCommand(bufferLine);
+        bufferLine = "";
+      }
+    } else {
+      bufferLine += c;
     }
   }
-
-  Serial.println("ERR:CMD");
 }
