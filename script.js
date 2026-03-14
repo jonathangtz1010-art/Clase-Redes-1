@@ -2,7 +2,7 @@
    CREDENCIALES DEL LOGIN
    Aquí puedes cambiar el usuario y contraseña
 ========================================= */
-const usuarioCorrecto = "admin";
+const usuarioCorrecto = "jonathan";
 const contrasenaCorrecta = "12345";
 
 /* =========================================
@@ -75,8 +75,6 @@ const descripcionGeneral = document.getElementById("descripcionGeneral");
 
 /* =========================================
    FUNCIÓN PARA LIMITAR VALORES
-   Evita que el usuario escriba números fuera
-   del rango permitido
 ========================================= */
 function limitarValor(valor, minimo, maximo) {
   let numero = parseInt(valor);
@@ -129,9 +127,9 @@ function actualizarHora() {
 }
 
 /* =========================================
-   LOGIN
-   Solo muestra la interfaz principal si
-   el usuario y contraseña son correctos
+   FUNCIÓN LOGIN
+   Si el usuario y contraseña son correctos,
+   oculta el login y muestra el monitoreo
 ========================================= */
 function iniciarSesion() {
   const usuario = usuarioInput.value.trim();
@@ -153,14 +151,14 @@ function iniciarSesion() {
 
 btnLogin.addEventListener("click", iniciarSesion);
 
-/* Permite entrar también con la tecla Enter */
-contrasenaInput.addEventListener("keypress", function (event) {
+/* Permite entrar con la tecla Enter */
+usuarioInput.addEventListener("keypress", function (event) {
   if (event.key === "Enter") {
     iniciarSesion();
   }
 });
 
-usuarioInput.addEventListener("keypress", function (event) {
+contrasenaInput.addEventListener("keypress", function (event) {
   if (event.key === "Enter") {
     iniciarSesion();
   }
@@ -180,8 +178,6 @@ btnLogout.addEventListener("click", function () {
 
 /* =========================================
    SINCRONIZAR CONTROLES
-   Mantiene igual el valor del slider y el
-   campo numérico
 ========================================= */
 function sincronizarControles(range, input, minimo, maximo) {
   range.addEventListener("input", function () {
@@ -199,7 +195,7 @@ function sincronizarControles(range, input, minimo, maximo) {
   });
 }
 
-/* Se conectan los 5 sensores */
+/* Conectar los 5 sensores */
 sincronizarControles(humedadRange, humedadInput, 0, 100);
 sincronizarControles(temperaturaRange, temperaturaInput, 0, 50);
 sincronizarControles(luzRange, luzInput, 0, 100);
@@ -207,10 +203,7 @@ sincronizarControles(nivelRange, nivelInput, 0, 100);
 sincronizarControles(proximidadRange, proximidadInput, 0, 100);
 
 /* =========================================
-   LÓGICA DEL SENSOR DE HUMEDAD
-   <= 8    -> rojo
-   9 a 20  -> amarillo
-   > 20    -> verde
+   LÓGICA DE HUMEDAD
 ========================================= */
 function actualizarHumedad() {
   const humedad = parseInt(humedadRange.value);
@@ -232,12 +225,7 @@ function actualizarHumedad() {
 }
 
 /* =========================================
-   LÓGICA DEL SENSOR DE TEMPERATURA
-   < 10      -> rojo
-   10 a 17   -> amarillo
-   18 a 28   -> verde
-   29 a 35   -> amarillo
-   > 35      -> rojo
+   LÓGICA DE TEMPERATURA
 ========================================= */
 function actualizarTemperatura() {
   const temperatura = parseInt(temperaturaRange.value);
@@ -267,10 +255,7 @@ function actualizarTemperatura() {
 }
 
 /* =========================================
-   LÓGICA DEL SENSOR DE LUZ
-   <= 20    -> rojo
-   21 a 50  -> amarillo
-   > 50     -> verde
+   LÓGICA DE LUZ
 ========================================= */
 function actualizarLuz() {
   const luz = parseInt(luzRange.value);
@@ -292,10 +277,7 @@ function actualizarLuz() {
 }
 
 /* =========================================
-   LÓGICA DEL SENSOR DE NIVEL DE AGUA
-   <= 20    -> rojo
-   21 a 50  -> amarillo
-   > 50     -> verde
+   LÓGICA DE NIVEL DE AGUA
 ========================================= */
 function actualizarNivelAgua() {
   const nivel = parseInt(nivelRange.value);
@@ -317,10 +299,7 @@ function actualizarNivelAgua() {
 }
 
 /* =========================================
-   LÓGICA DEL SENSOR DE PROXIMIDAD
-   <= 10 cm   -> rojo
-   11 a 25 cm -> amarillo
-   > 25 cm    -> verde
+   LÓGICA DE PROXIMIDAD
 ========================================= */
 function actualizarProximidad() {
   const proximidad = parseInt(proximidadRange.value);
@@ -343,9 +322,6 @@ function actualizarProximidad() {
 
 /* =========================================
    ESTADO GENERAL DEL SISTEMA
-   Si algún sensor está en rojo -> alerta
-   Si no hay rojo pero sí amarillo -> advertencia
-   Si todos están en verde -> normal
 ========================================= */
 function actualizarEstadoGeneral(estados) {
   if (estados.includes("rojo")) {
@@ -364,7 +340,7 @@ function actualizarEstadoGeneral(estados) {
 }
 
 /* =========================================
-   BOTÓN PARA GENERAR VALORES ALEATORIOS
+   BOTÓN DE VALORES ALEATORIOS
 ========================================= */
 btnAleatorio.addEventListener("click", function () {
   const humedadRandom = Math.floor(Math.random() * 101);
@@ -392,7 +368,7 @@ btnAleatorio.addEventListener("click", function () {
 });
 
 /* =========================================
-   BOTÓN PARA RESTABLECER VALORES
+   BOTÓN DE RESTABLECER
 ========================================= */
 btnReset.addEventListener("click", function () {
   humedadRange.value = 45;
@@ -414,9 +390,7 @@ btnReset.addEventListener("click", function () {
 });
 
 /* =========================================
-   FUNCIÓN GENERAL
-   Actualiza todos los sensores, LEDs,
-   estado general y hora
+   ACTUALIZAR TODO
 ========================================= */
 function actualizarTodo() {
   const estado1 = actualizarHumedad();
@@ -434,5 +408,5 @@ function actualizarTodo() {
 ========================================= */
 setInterval(actualizarHora, 1000);
 
-/* Inicializa valores al cargar el archivo */
+/* Inicialización */
 actualizarTodo();
