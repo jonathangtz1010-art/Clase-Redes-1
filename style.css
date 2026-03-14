@@ -13,7 +13,6 @@
 :root {
   --bg-main: #07111f;
   --bg-card: rgba(16, 27, 46, 0.78);
-  --bg-card-strong: rgba(8, 17, 32, 0.92);
   --line: rgba(255, 255, 255, 0.08);
 
   --text: #f4f7fb;
@@ -27,7 +26,6 @@
   --danger: #ef4444;
 
   --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-  --radius: 22px;
 }
 
 /* =========================
@@ -94,13 +92,18 @@ body {
 
 /* =========================
    LOGIN
+   OJO: así sí se oculta correctamente
+   cuando quitas la clase active
 ========================= */
 #loginSection {
   min-height: 100vh;
-  display: flex;
   align-items: center;
   justify-content: center;
   padding: 30px;
+}
+
+#loginSection.active {
+  display: flex;
 }
 
 .login-card {
@@ -273,7 +276,7 @@ body {
 }
 
 .panel {
-  background: var(--bg-card);
+  background: rgba(16, 27, 46, 0.78);
   border: 1px solid var(--line);
   border-radius: 24px;
   padding: 24px;
@@ -319,10 +322,6 @@ body {
   border: 1px solid var(--line);
   border-radius: 20px;
   padding: 20px;
-}
-
-.sensor-card {
-  min-height: 100%;
 }
 
 .card-top {
