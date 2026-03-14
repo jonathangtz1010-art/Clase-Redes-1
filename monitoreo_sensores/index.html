@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitoreo de sensores</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Fondo decorativo -->
+  <div class="bg-shape shape-1"></div>
+  <div class="bg-shape shape-2"></div>
+  <div class="bg-grid"></div>
+
+  <!-- =========================
+       PANTALLA DE LOGIN
+  ========================== -->
+  <section id="loginSection" class="screen active">
+    <div class="login-card">
+      <div class="brand-box">
+        <div class="brand-icon">◉</div>
+        <div>
+          <h1>Monitoreo de sensores</h1>
+          <p>Acceso al sistema de supervisión virtual</p>
+        </div>
+      </div>
+
+      <h2>Inicio de sesión</h2>
+      <p class="login-text">
+        Ingresa tu usuario y contraseña para visualizar la interfaz principal del sistema,
+        los sensores simulados y los indicadores virtuales tipo LED.
+      </p>
+
+      <div class="input-group">
+        <label for="usuario">Usuario</label>
+        <input type="text" id="usuario" placeholder="Ingresa tu usuario">
+      </div>
+
+      <div class="input-group">
+        <label for="contrasena">Contraseña</label>
+        <input type="password" id="contrasena" placeholder="Ingresa tu contraseña">
+      </div>
+
+      <button id="btnLogin" class="btn btn-primary">Entrar al sistema</button>
+      <p id="mensajeLogin" class="mensaje-login"></p>
+    </div>
+  </section>
+
+  <!-- =========================
+       INTERFAZ PRINCIPAL
+  ========================== -->
+  <section id="dashboardSection" class="screen">
+    <header class="topbar">
+      <div class="brand-box">
+        <div class="brand-icon">◉</div>
+        <div>
+          <h1>Monitoreo de sensores</h1>
+          <p>Panel principal de monitoreo con sensores simulados y LEDs virtuales</p>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <div class="time-box">
+          <span>Última actualización</span>
+          <strong id="horaActual">--:--:--</strong>
+        </div>
+        <button id="btnLogout" class="btn btn-outline">Cerrar sesión</button>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <!-- Panel principal -->
+      <section class="panel panel-main">
+        <div class="panel-header">
+          <h2>Área de monitoreo</h2>
+          <span class="status-live">Sistema activo</span>
+        </div>
+
+        <div class="cards-grid">
+
+          <!-- SENSOR 1: HUMEDAD -->
+          <article class="sensor-card">
+            <div class="card-top">
+              <h3>Sensor de humedad</h3>
+              <span class="badge">Obligatorio</span>
+            </div>
+
+            <div class="sensor-value">
+              <span id="humedadValor">45</span><small>%</small>
+            </div>
+
+            <div class="control-box">
+              <label for="humedadRange">Modificar humedad</label>
+              <input type="range" id="humedadRange" min="0" max="100" value="45">
+            </div>
+
+            <div class="control-box">
+              <label for="humedadInput">Valor manual</label>
+              <input type="number" id="humedadInput" min="0" max="100" value="45">
+            </div>
+
+            <div class="led-info">
+              <div class="led led-off" id="ledHumedad"></div>
+              <div>
+                <p class="led-title">LED de humedad</p>
+                <p id="estadoHumedad" class="led-state">Estado: Estable</p>
+              </div>
+            </div>
+          </article>
+
+          <!-- SENSOR 2: TEMPERATURA -->
+          <article class="sensor-card">
+            <div class="card-top">
+              <h3>Sensor de temperatura</h3>
+              <span class="badge secondary">Adicional</span>
+            </div>
+
+            <div class="sensor-value">
+              <span id="temperaturaValor">24</span><small>°C</small>
+            </div>
+
+            <div class="control-box">
+              <label for="temperaturaRange">Modificar temperatura</label>
+              <input type="range" id="temperaturaRange" min="0" max="50" value="24">
+            </div>
+
+            <div class="control-box">
+              <label for="temperaturaInput">Valor manual</label>
+              <input type="number" id="temperaturaInput" min="0" max="50" value="24">
+            </div>
+
+            <div class="led-info">
+              <div class="led led-off" id="ledTemperatura"></div>
+              <div>
+                <p class="led-title">LED de temperatura</p>
+                <p id="estadoTemperatura" class="led-state">Estado: Normal</p>
+              </div>
+            </div>
+          </article>
+
+          <!-- SENSOR 3: LUZ -->
+          <article class="sensor-card">
+            <div class="card-top">
+              <h3>Sensor de luz ambiental</h3>
+              <span class="badge secondary">Adicional</span>
+            </div>
+
+            <div class="sensor-value">
+              <span id="luzValor">60</span><small>%</small>
+            </div>
+
+            <div class="control-box">
+              <label for="luzRange">Modificar luz ambiental</label>
+              <input type="range" id="luzRange" min="0" max="100" value="60">
+            </div>
+
+            <div class="control-box">
+              <label for="luzInput">Valor manual</label>
+              <input type="number" id="luzInput" min="0" max="100" value="60">
+            </div>
+
+            <div class="led-info">
+              <div class="led led-off" id="ledLuz"></div>
+              <div>
+                <p class="led-title">LED de luz ambiental</p>
+                <p id="estadoLuz" class="led-state">Estado: Adecuado</p>
+              </div>
+            </div>
+          </article>
+
+          <!-- SENSOR 4: NIVEL DE AGUA -->
+          <article class="sensor-card">
+            <div class="card-top">
+              <h3>Sensor de nivel de agua del tanque</h3>
+              <span class="badge secondary">Adicional</span>
+            </div>
+
+            <div class="sensor-value">
+              <span id="nivelValor">70</span><small>%</small>
+            </div>
+
+            <div class="control-box">
+              <label for="nivelRange">Modificar nivel de agua del tanque</label>
+              <input type="range" id="nivelRange" min="0" max="100" value="70">
+            </div>
+
+            <div class="control-box">
+              <label for="nivelInput">Valor manual</label>
+              <input type="number" id="nivelInput" min="0" max="100" value="70">
+            </div>
+
+            <div class="led-info">
+              <div class="led led-off" id="ledNivel"></div>
+              <div>
+                <p class="led-title">LED de nivel de agua</p>
+                <p id="estadoNivel" class="led-state">Estado: Correcto</p>
+              </div>
+            </div>
+          </article>
+
+          <!-- SENSOR 5: PROXIMIDAD -->
+          <article class="sensor-card">
+            <div class="card-top">
+              <h3>Sensor de proximidad de objeto</h3>
+              <span class="badge secondary">Adicional</span>
+            </div>
+
+            <div class="sensor-value">
+              <span id="proximidadValor">40</span><small>cm</small>
+            </div>
+
+            <div class="control-box">
+              <label for="proximidadRange">Modificar proximidad</label>
+              <input type="range" id="proximidadRange" min="0" max="100" value="40">
+            </div>
+
+            <div class="control-box">
+              <label for="proximidadInput">Valor manual</label>
+              <input type="number" id="proximidadInput" min="0" max="100" value="40">
+            </div>
+
+            <div class="led-info">
+              <div class="led led-off" id="ledProximidad"></div>
+              <div>
+                <p class="led-title">LED de proximidad</p>
+                <p id="estadoProximidad" class="led-state">Estado: Distancia segura</p>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="action-row">
+          <button id="btnAleatorio" class="btn btn-primary">Generar valores aleatorios</button>
+          <button id="btnReset" class="btn btn-secondary">Restablecer valores</button>
+        </div>
+      </section>
+
+      <!-- Panel lateral -->
+      <aside class="panel panel-side">
+        <div class="panel-header">
+          <h2>Resumen del sistema</h2>
+        </div>
+
+        <div class="summary-card">
+          <p class="summary-label">Resumen del sistema</p>
+          <h3 id="estadoGeneral">Operación normal</h3>
+          <p id="descripcionGeneral" class="summary-text">
+            Todos los sensores se encuentran en rangos adecuados y el sistema opera correctamente.
+          </p>
+        </div>
+
+        <!-- NUEVAS TARJETAS DE RESUMEN -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span id="totalSensores" class="stat-number">5</span>
+            <p class="stat-label">Total sensores</p>
+          </div>
+
+          <div class="stat-card">
+            <span id="totalNormales" class="stat-number">5</span>
+            <p class="stat-label">Normales</p>
+          </div>
+
+          <div class="stat-card">
+            <span id="totalAdvertencia" class="stat-number">0</span>
+            <p class="stat-label">Advertencia</p>
+          </div>
+
+          <div class="stat-card">
+            <span id="totalCriticos" class="stat-number">0</span>
+            <p class="stat-label">Críticos</p>
+          </div>
+        </div>
+
+        <div class="legend-card">
+          <h3>Lógica visual de LEDs</h3>
+
+          <div class="legend-item">
+            <span class="mini-led red"></span>
+            <p><strong>Rojo:</strong> condición crítica</p>
+          </div>
+
+          <div class="legend-item">
+            <span class="mini-led yellow"></span>
+            <p><strong>Amarillo:</strong> advertencia</p>
+          </div>
+
+          <div class="legend-item">
+            <span class="mini-led green"></span>
+            <p><strong>Verde:</strong> condición estable</p>
+          </div>
+        </div>
+
+        <div class="logic-card">
+          <h3>Condiciones aplicadas</h3>
+          <ul>
+            <li><strong>Humedad:</strong> ≤ 8% rojo, 9% a 20% amarillo, > 20% verde.</li>
+            <li><strong>Temperatura:</strong> &lt; 10°C rojo, 10°C a 17°C amarillo, 18°C a 28°C verde, 29°C a 35°C amarillo, &gt; 35°C rojo.</li>
+            <li><strong>Luz ambiental:</strong> ≤ 20% rojo, 21% a 50% amarillo, > 50% verde.</li>
+            <li><strong>Nivel de agua del tanque:</strong> ≤ 20% rojo, 21% a 50% amarillo, > 50% verde.</li>
+            <li><strong>Proximidad de objeto:</strong> ≤ 10 cm rojo, 11 cm a 25 cm amarillo, > 25 cm verde.</li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>
