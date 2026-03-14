@@ -1,6 +1,5 @@
 /* =========================================
    CREDENCIALES DEL LOGIN
-   Aquí puedes cambiar el usuario y contraseña
 ========================================= */
 const usuarioCorrecto = "jonathan";
 const contrasenaCorrecta = "12345";
@@ -10,16 +9,14 @@ const contrasenaCorrecta = "12345";
 ========================================= */
 const loginSection = document.getElementById("loginSection");
 const dashboardSection = document.getElementById("dashboardSection");
-
 const usuarioInput = document.getElementById("usuario");
 const contrasenaInput = document.getElementById("contrasena");
-
 const btnLogin = document.getElementById("btnLogin");
 const mensajeLogin = document.getElementById("mensajeLogin");
 const btnLogout = document.getElementById("btnLogout");
 
 /* =========================================
-   ELEMENTOS DE HUMEDAD
+   HUMEDAD
 ========================================= */
 const humedadRange = document.getElementById("humedadRange");
 const humedadInput = document.getElementById("humedadInput");
@@ -28,7 +25,7 @@ const ledHumedad = document.getElementById("ledHumedad");
 const estadoHumedad = document.getElementById("estadoHumedad");
 
 /* =========================================
-   ELEMENTOS DE TEMPERATURA
+   TEMPERATURA
 ========================================= */
 const temperaturaRange = document.getElementById("temperaturaRange");
 const temperaturaInput = document.getElementById("temperaturaInput");
@@ -37,7 +34,7 @@ const ledTemperatura = document.getElementById("ledTemperatura");
 const estadoTemperatura = document.getElementById("estadoTemperatura");
 
 /* =========================================
-   ELEMENTOS DE LUZ
+   LUZ
 ========================================= */
 const luzRange = document.getElementById("luzRange");
 const luzInput = document.getElementById("luzInput");
@@ -46,7 +43,7 @@ const ledLuz = document.getElementById("ledLuz");
 const estadoLuz = document.getElementById("estadoLuz");
 
 /* =========================================
-   ELEMENTOS DE NIVEL DE AGUA
+   NIVEL DE AGUA
 ========================================= */
 const nivelRange = document.getElementById("nivelRange");
 const nivelInput = document.getElementById("nivelInput");
@@ -55,7 +52,7 @@ const ledNivel = document.getElementById("ledNivel");
 const estadoNivel = document.getElementById("estadoNivel");
 
 /* =========================================
-   ELEMENTOS DE PROXIMIDAD
+   PROXIMIDAD
 ========================================= */
 const proximidadRange = document.getElementById("proximidadRange");
 const proximidadInput = document.getElementById("proximidadInput");
@@ -64,14 +61,22 @@ const ledProximidad = document.getElementById("ledProximidad");
 const estadoProximidad = document.getElementById("estadoProximidad");
 
 /* =========================================
-   ELEMENTOS DE BOTONES Y RESUMEN
+   RESUMEN GENERAL
 ========================================= */
-const btnAleatorio = document.getElementById("btnAleatorio");
-const btnReset = document.getElementById("btnReset");
-
 const horaActual = document.getElementById("horaActual");
 const estadoGeneral = document.getElementById("estadoGeneral");
 const descripcionGeneral = document.getElementById("descripcionGeneral");
+
+const totalSensores = document.getElementById("totalSensores");
+const totalNormales = document.getElementById("totalNormales");
+const totalAdvertencia = document.getElementById("totalAdvertencia");
+const totalCriticos = document.getElementById("totalCriticos");
+
+/* =========================================
+   BOTONES
+========================================= */
+const btnAleatorio = document.getElementById("btnAleatorio");
+const btnReset = document.getElementById("btnReset");
 
 /* =========================================
    FUNCIÓN PARA LIMITAR VALORES
@@ -95,14 +100,14 @@ function limitarValor(valor, minimo, maximo) {
 }
 
 /* =========================================
-   FUNCIÓN PARA LIMPIAR EL COLOR DEL LED
+   LIMPIAR COLOR DEL LED
 ========================================= */
 function limpiarLed(led) {
   led.classList.remove("led-green", "led-yellow", "led-red", "led-off");
 }
 
 /* =========================================
-   FUNCIÓN PARA COLOCAR EL COLOR DEL LED
+   PONER COLOR AL LED
 ========================================= */
 function ponerLed(led, color) {
   limpiarLed(led);
@@ -119,7 +124,7 @@ function ponerLed(led, color) {
 }
 
 /* =========================================
-   FUNCIÓN PARA ACTUALIZAR LA HORA
+   ACTUALIZAR HORA
 ========================================= */
 function actualizarHora() {
   const ahora = new Date();
@@ -127,9 +132,7 @@ function actualizarHora() {
 }
 
 /* =========================================
-   FUNCIÓN LOGIN
-   Si el usuario y contraseña son correctos,
-   oculta el login y muestra el monitoreo
+   LOGIN
 ========================================= */
 function iniciarSesion() {
   const usuario = usuarioInput.value.trim();
@@ -151,7 +154,6 @@ function iniciarSesion() {
 
 btnLogin.addEventListener("click", iniciarSesion);
 
-/* Permite entrar con la tecla Enter */
 usuarioInput.addEventListener("keypress", function (event) {
   if (event.key === "Enter") {
     iniciarSesion();
@@ -177,7 +179,7 @@ btnLogout.addEventListener("click", function () {
 });
 
 /* =========================================
-   SINCRONIZAR CONTROLES
+   SINCRONIZAR SLIDER Y INPUT
 ========================================= */
 function sincronizarControles(range, input, minimo, maximo) {
   range.addEventListener("input", function () {
@@ -195,7 +197,6 @@ function sincronizarControles(range, input, minimo, maximo) {
   });
 }
 
-/* Conectar los 5 sensores */
 sincronizarControles(humedadRange, humedadInput, 0, 100);
 sincronizarControles(temperaturaRange, temperaturaInput, 0, 50);
 sincronizarControles(luzRange, luzInput, 0, 100);
@@ -203,7 +204,7 @@ sincronizarControles(nivelRange, nivelInput, 0, 100);
 sincronizarControles(proximidadRange, proximidadInput, 0, 100);
 
 /* =========================================
-   LÓGICA DE HUMEDAD
+   HUMEDAD
 ========================================= */
 function actualizarHumedad() {
   const humedad = parseInt(humedadRange.value);
@@ -225,7 +226,7 @@ function actualizarHumedad() {
 }
 
 /* =========================================
-   LÓGICA DE TEMPERATURA
+   TEMPERATURA
 ========================================= */
 function actualizarTemperatura() {
   const temperatura = parseInt(temperaturaRange.value);
@@ -255,7 +256,7 @@ function actualizarTemperatura() {
 }
 
 /* =========================================
-   LÓGICA DE LUZ
+   LUZ
 ========================================= */
 function actualizarLuz() {
   const luz = parseInt(luzRange.value);
@@ -277,7 +278,7 @@ function actualizarLuz() {
 }
 
 /* =========================================
-   LÓGICA DE NIVEL DE AGUA
+   NIVEL DE AGUA
 ========================================= */
 function actualizarNivelAgua() {
   const nivel = parseInt(nivelRange.value);
@@ -299,7 +300,7 @@ function actualizarNivelAgua() {
 }
 
 /* =========================================
-   LÓGICA DE PROXIMIDAD
+   PROXIMIDAD
 ========================================= */
 function actualizarProximidad() {
   const proximidad = parseInt(proximidadRange.value);
@@ -321,6 +322,30 @@ function actualizarProximidad() {
 }
 
 /* =========================================
+   ACTUALIZAR TARJETAS DE RESUMEN
+========================================= */
+function actualizarTarjetasResumen(estados) {
+  let normales = 0;
+  let advertencia = 0;
+  let criticos = 0;
+
+  for (let i = 0; i < estados.length; i++) {
+    if (estados[i] === "verde") {
+      normales++;
+    } else if (estados[i] === "amarillo") {
+      advertencia++;
+    } else if (estados[i] === "rojo") {
+      criticos++;
+    }
+  }
+
+  totalSensores.textContent = estados.length;
+  totalNormales.textContent = normales;
+  totalAdvertencia.textContent = advertencia;
+  totalCriticos.textContent = criticos;
+}
+
+/* =========================================
    ESTADO GENERAL DEL SISTEMA
 ========================================= */
 function actualizarEstadoGeneral(estados) {
@@ -331,16 +356,16 @@ function actualizarEstadoGeneral(estados) {
   } else if (estados.includes("amarillo")) {
     estadoGeneral.textContent = "Sistema en advertencia";
     descripcionGeneral.textContent =
-      "El sistema sigue funcionando, pero uno o más sensores están en una condición intermedia que requiere atención.";
+      "Uno o más sensores se encuentran en una condición intermedia que requiere atención.";
   } else {
     estadoGeneral.textContent = "Operación normal";
     descripcionGeneral.textContent =
-      "Todos los sensores están dentro de rangos adecuados y los LEDs muestran condiciones estables.";
+      "Todos los sensores se encuentran en rangos adecuados y el sistema opera correctamente.";
   }
 }
 
 /* =========================================
-   BOTÓN DE VALORES ALEATORIOS
+   BOTÓN ALEATORIO
 ========================================= */
 btnAleatorio.addEventListener("click", function () {
   const humedadRandom = Math.floor(Math.random() * 101);
@@ -368,7 +393,7 @@ btnAleatorio.addEventListener("click", function () {
 });
 
 /* =========================================
-   BOTÓN DE RESTABLECER
+   BOTÓN RESET
 ========================================= */
 btnReset.addEventListener("click", function () {
   humedadRange.value = 45;
@@ -399,7 +424,10 @@ function actualizarTodo() {
   const estado4 = actualizarNivelAgua();
   const estado5 = actualizarProximidad();
 
-  actualizarEstadoGeneral([estado1, estado2, estado3, estado4, estado5]);
+  const estados = [estado1, estado2, estado3, estado4, estado5];
+
+  actualizarEstadoGeneral(estados);
+  actualizarTarjetasResumen(estados);
   actualizarHora();
 }
 
