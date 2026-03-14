@@ -77,7 +77,6 @@
           <span class="status-live">Sistema activo</span>
         </div>
 
-        <!-- Tarjetas de sensores -->
         <div class="cards-grid">
 
           <!-- SENSOR 1: HUMEDAD -->
@@ -229,7 +228,6 @@
               </div>
             </div>
           </article>
-
         </div>
 
         <div class="action-row">
@@ -245,19 +243,34 @@
         </div>
 
         <div class="summary-card">
-          <p class="summary-label">Estado general</p>
+          <p class="summary-label">Resumen del sistema</p>
           <h3 id="estadoGeneral">Operación normal</h3>
           <p id="descripcionGeneral" class="summary-text">
-            Todos los sensores están dentro de rangos adecuados y los LEDs muestran condiciones estables.
+            Todos los sensores se encuentran en rangos adecuados y el sistema opera correctamente.
           </p>
         </div>
 
-        <div class="summary-card">
-          <p class="summary-label">Unidad del sistema</p>
-          <h3>Panel de monitoreo virtual</h3>
-          <p class="summary-text">
-            Esta interfaz simula el comportamiento de sensores y LEDs físicos mediante HTML, CSS y JavaScript.
-          </p>
+        <!-- NUEVAS TARJETAS DE RESUMEN -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span id="totalSensores" class="stat-number">5</span>
+            <p class="stat-label">Total sensores</p>
+          </div>
+
+          <div class="stat-card">
+            <span id="totalNormales" class="stat-number">5</span>
+            <p class="stat-label">Normales</p>
+          </div>
+
+          <div class="stat-card">
+            <span id="totalAdvertencia" class="stat-number">0</span>
+            <p class="stat-label">Advertencia</p>
+          </div>
+
+          <div class="stat-card">
+            <span id="totalCriticos" class="stat-number">0</span>
+            <p class="stat-label">Críticos</p>
+          </div>
         </div>
 
         <div class="legend-card">
@@ -296,4 +309,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-
