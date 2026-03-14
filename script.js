@@ -1,11 +1,34 @@
+/* =========================================
+   CREDENCIALES DEL LOGIN
+========================================= */
 const usuarioCorrecto = "jonathan";
 const contrasenaCorrecta = "12345";
 
+/* =========================================
+   ATAJO PARA OBTENER ELEMENTOS POR ID
+========================================= */
 const $ = id => document.getElementById(id);
+
+/* =========================================
+   FUNCIÓN PARA PONER PRIMERA LETRA MAYÚSCULA
+   Ejemplo: "humedad" -> "Humedad"
+========================================= */
 const cap = txt => txt.charAt(0).toUpperCase() + txt.slice(1);
+
+/* =========================================
+   FUNCIÓN PARA LIMITAR VALORES
+   Si el valor se sale del rango, lo corrige
+========================================= */
 const limitar = (v, min, max) => Math.max(min, Math.min(max, parseInt(v) || min));
+
+/* =========================================
+   FUNCIÓN PARA GENERAR NÚMEROS ALEATORIOS
+========================================= */
 const random = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
+/* =========================================
+   ELEMENTOS PRINCIPALES
+========================================= */
 const loginSection = $("loginSection");
 const dashboardSection = $("dashboardSection");
 const usuarioInput = $("usuario");
@@ -13,18 +36,26 @@ const contrasenaInput = $("contrasena");
 const btnLogin = $("btnLogin");
 const mensajeLogin = $("mensajeLogin");
 const btnLogout = $("btnLogout");
+
 const horaActual = $("horaActual");
 const estadoGeneral = $("estadoGeneral");
 const descripcionGeneral = $("descripcionGeneral");
+
 const totalSensores = $("totalSensores");
 const totalNormales = $("totalNormales");
 const totalAdvertencia = $("totalAdvertencia");
 const totalCriticos = $("totalCriticos");
+
 const btnAleatorio = $("btnAleatorio");
 const btnReset = $("btnReset");
+
 const cardsGrid = $("cardsGrid");
 const logicList = $("logicList");
 
+/* =========================================
+   CONFIGURACIÓN DE LOS SENSORES
+   Aquí se guarda toda la información
+========================================= */
 const sensores = [
   {
     id: "humedad",
@@ -115,18 +146,29 @@ const sensores = [
   }
 ];
 
+/* =========================================
+   CAMBIAR COLOR DEL LED
+========================================= */
 function ponerLed(led, color) {
   led.className = `led ${
     color === "rojo" ? "led-red" :
     color === "amarillo" ? "led-yellow" :
-    color === "verde" ? "led-green" : "led-off"
+    color === "verde" ? "led-green" :
+    "led-off"
   }`;
 }
 
+/* =========================================
+   ACTUALIZAR LA HORA EN PANTALLA
+========================================= */
 function actualizarHora() {
   horaActual.textContent = new Date().toLocaleTimeString();
 }
 
+/* =========================================
+   CREAR LAS TARJETAS DE LOS SENSORES
+   Se generan automáticamente desde el arreglo
+========================================= */
 function crearInterfaz() {
   cardsGrid.innerHTML = sensores.map(s => `
     <article class="sensor-card">
@@ -164,18 +206,30 @@ function crearInterfaz() {
     .join("");
 }
 
+/* =========================================
+   ACTUALIZAR UN SENSOR
+   - Toma su valor actual
+   - Cambia número mostrado
+   - Cambia LED
+   - Cambia texto del estado
+========================================= */
 function actualizarSensor(s) {
   const v = +$(s.id + "Range").value;
+
   $(s.id + "Input").value = v;
   $(s.id + "Valor").textContent = v;
 
   const [color, texto] = s.evaluar(v);
+
   ponerLed($("led" + cap(s.id)), color);
   $("estado" + cap(s.id)).textContent = "Estado: " + texto;
 
   return color;
 }
 
+/* =========================================
+   ACTUALIZAR RESUMEN GENERAL
+========================================= */
 function actualizarResumen(estados) {
   const normales = estados.filter(e => e === "verde").length;
   const advertencia = estados.filter(e => e === "amarillo").length;
@@ -201,12 +255,19 @@ function actualizarResumen(estados) {
   }
 }
 
+/* =========================================
+   ACTUALIZAR TODO EL SISTEMA
+========================================= */
 function actualizarTodo() {
   const estados = sensores.map(s => actualizarSensor(s));
   actualizarResumen(estados);
   actualizarHora();
 }
 
+/* =========================================
+   VINCULAR LOS SLIDERS Y LOS INPUTS
+   Cuando cambias uno, se actualiza el otro
+========================================= */
 function enlazarControles() {
   sensores.forEach(s => {
     const range = $(s.id + "Range");
@@ -226,6 +287,9 @@ function enlazarControles() {
   });
 }
 
+/* =========================================
+   INICIAR SESIÓN
+========================================= */
 function iniciarSesion() {
   const usuario = usuarioInput.value.trim();
   const contrasena = contrasenaInput.value.trim();
@@ -233,8 +297,10 @@ function iniciarSesion() {
   if (usuario === usuarioCorrecto && contrasena === contrasenaCorrecta) {
     mensajeLogin.textContent = "Acceso correcto. Bienvenido al sistema.";
     mensajeLogin.style.color = "#22c55e";
+
     loginSection.classList.remove("active");
     dashboardSection.classList.add("active");
+
     actualizarTodo();
   } else {
     mensajeLogin.textContent = "Usuario o contraseña incorrectos.";
@@ -242,43 +308,68 @@ function iniciarSesion() {
   }
 }
 
+/* =========================================
+   CERRAR SESIÓN
+========================================= */
 function cerrarSesion() {
   dashboardSection.classList.remove("active");
   loginSection.classList.add("active");
+
   usuarioInput.value = "";
   contrasenaInput.value = "";
   mensajeLogin.textContent = "";
 }
 
+/* =========================================
+   GENERAR VALORES ALEATORIOS
+========================================= */
 function aleatorio() {
   sensores.forEach(s => {
     const v = random(s.min, s.max);
     $(s.id + "Range").value = v;
     $(s.id + "Input").value = v;
   });
+
   actualizarTodo();
 }
 
+/* =========================================
+   RESTABLECER VALORES ORIGINALES
+========================================= */
 function resetear() {
   sensores.forEach(s => {
     $(s.id + "Range").value = s.valor;
     $(s.id + "Input").value = s.valor;
   });
+
   actualizarTodo();
 }
 
+/* =========================================
+   EVENTOS DE BOTONES
+========================================= */
 btnLogin.addEventListener("click", iniciarSesion);
 btnLogout.addEventListener("click", cerrarSesion);
 btnAleatorio.addEventListener("click", aleatorio);
 btnReset.addEventListener("click", resetear);
 
+/* =========================================
+   PERMITIR ENTER EN EL LOGIN
+========================================= */
 [usuarioInput, contrasenaInput].forEach(input => {
   input.addEventListener("keypress", e => {
     if (e.key === "Enter") iniciarSesion();
   });
 });
 
+/* =========================================
+   INICIALIZACIÓN DEL SISTEMA
+========================================= */
 crearInterfaz();
 enlazarControles();
 actualizarTodo();
+
+/* =========================================
+   RELOJ AUTOMÁTICO
+========================================= */
 setInterval(actualizarHora, 1000);
