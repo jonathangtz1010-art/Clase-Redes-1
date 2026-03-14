@@ -5,134 +5,290 @@ const usuarioCorrecto = "jonathan";
 const contrasenaCorrecta = "12345";
 
 /* =========================================
-   ELEMENTOS DEL LOGIN
+   ATAJO PARA OBTENER ELEMENTOS POR ID
 ========================================= */
-const loginSection = document.getElementById("loginSection");
-const dashboardSection = document.getElementById("dashboardSection");
-const usuarioInput = document.getElementById("usuario");
-const contrasenaInput = document.getElementById("contrasena");
-const btnLogin = document.getElementById("btnLogin");
-const mensajeLogin = document.getElementById("mensajeLogin");
-const btnLogout = document.getElementById("btnLogout");
+const $ = id => document.getElementById(id);
 
 /* =========================================
-   HUMEDAD
+   FUNCIÓN PARA PONER PRIMERA LETRA MAYÚSCULA
+   Ejemplo: "humedad" -> "Humedad"
 ========================================= */
-const humedadRange = document.getElementById("humedadRange");
-const humedadInput = document.getElementById("humedadInput");
-const humedadValor = document.getElementById("humedadValor");
-const ledHumedad = document.getElementById("ledHumedad");
-const estadoHumedad = document.getElementById("estadoHumedad");
-
-/* =========================================
-   TEMPERATURA
-========================================= */
-const temperaturaRange = document.getElementById("temperaturaRange");
-const temperaturaInput = document.getElementById("temperaturaInput");
-const temperaturaValor = document.getElementById("temperaturaValor");
-const ledTemperatura = document.getElementById("ledTemperatura");
-const estadoTemperatura = document.getElementById("estadoTemperatura");
-
-/* =========================================
-   LUZ
-========================================= */
-const luzRange = document.getElementById("luzRange");
-const luzInput = document.getElementById("luzInput");
-const luzValor = document.getElementById("luzValor");
-const ledLuz = document.getElementById("ledLuz");
-const estadoLuz = document.getElementById("estadoLuz");
-
-/* =========================================
-   NIVEL DE AGUA
-========================================= */
-const nivelRange = document.getElementById("nivelRange");
-const nivelInput = document.getElementById("nivelInput");
-const nivelValor = document.getElementById("nivelValor");
-const ledNivel = document.getElementById("ledNivel");
-const estadoNivel = document.getElementById("estadoNivel");
-
-/* =========================================
-   PROXIMIDAD
-========================================= */
-const proximidadRange = document.getElementById("proximidadRange");
-const proximidadInput = document.getElementById("proximidadInput");
-const proximidadValor = document.getElementById("proximidadValor");
-const ledProximidad = document.getElementById("ledProximidad");
-const estadoProximidad = document.getElementById("estadoProximidad");
-
-/* =========================================
-   RESUMEN GENERAL
-========================================= */
-const horaActual = document.getElementById("horaActual");
-const estadoGeneral = document.getElementById("estadoGeneral");
-const descripcionGeneral = document.getElementById("descripcionGeneral");
-
-const totalSensores = document.getElementById("totalSensores");
-const totalNormales = document.getElementById("totalNormales");
-const totalAdvertencia = document.getElementById("totalAdvertencia");
-const totalCriticos = document.getElementById("totalCriticos");
-
-/* =========================================
-   BOTONES
-========================================= */
-const btnAleatorio = document.getElementById("btnAleatorio");
-const btnReset = document.getElementById("btnReset");
+const cap = txt => txt.charAt(0).toUpperCase() + txt.slice(1);
 
 /* =========================================
    FUNCIÓN PARA LIMITAR VALORES
+   Si el valor se sale del rango, lo corrige
 ========================================= */
-function limitarValor(valor, minimo, maximo) {
-  let numero = parseInt(valor);
-
-  if (isNaN(numero)) {
-    numero = minimo;
-  }
-
-  if (numero < minimo) {
-    numero = minimo;
-  }
-
-  if (numero > maximo) {
-    numero = maximo;
-  }
-
-  return numero;
-}
+const limitar = (v, min, max) => Math.max(min, Math.min(max, parseInt(v) || min));
 
 /* =========================================
-   LIMPIAR COLOR DEL LED
+   FUNCIÓN PARA GENERAR NÚMEROS ALEATORIOS
 ========================================= */
-function limpiarLed(led) {
-  led.classList.remove("led-green", "led-yellow", "led-red", "led-off");
-}
+const random = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
 /* =========================================
-   PONER COLOR AL LED
+   ELEMENTOS PRINCIPALES
+========================================= */
+const loginSection = $("loginSection");
+const dashboardSection = $("dashboardSection");
+const usuarioInput = $("usuario");
+const contrasenaInput = $("contrasena");
+const btnLogin = $("btnLogin");
+const mensajeLogin = $("mensajeLogin");
+const btnLogout = $("btnLogout");
+
+const horaActual = $("horaActual");
+const estadoGeneral = $("estadoGeneral");
+const descripcionGeneral = $("descripcionGeneral");
+
+const totalSensores = $("totalSensores");
+const totalNormales = $("totalNormales");
+const totalAdvertencia = $("totalAdvertencia");
+const totalCriticos = $("totalCriticos");
+
+const btnAleatorio = $("btnAleatorio");
+const btnReset = $("btnReset");
+
+const cardsGrid = $("cardsGrid");
+const logicList = $("logicList");
+
+/* =========================================
+   CONFIGURACIÓN DE LOS SENSORES
+   Aquí se guarda toda la información
+========================================= */
+const sensores = [
+  {
+    id: "humedad",
+    nombre: "Sensor de humedad",
+    badge: "Obligatorio",
+    badgeClass: "",
+    unidad: "%",
+    min: 0,
+    max: 100,
+    valor: 45,
+    control: "Modificar humedad",
+    regla: "≤ 8% rojo, 9% a 20% amarillo, > 20% verde.",
+    evaluar(v) {
+      if (v <= 8) return ["rojo", "Crítico (humedad muy baja)"];
+      if (v <= 20) return ["amarillo", "Advertencia (humedad baja)"];
+      return ["verde", "Estable"];
+    }
+  },
+  {
+    id: "temperatura",
+    nombre: "Sensor de temperatura",
+    badge: "Adicional",
+    badgeClass: "secondary",
+    unidad: "°C",
+    min: 0,
+    max: 50,
+    valor: 24,
+    control: "Modificar temperatura",
+    regla: "< 10°C rojo, 10°C a 17°C amarillo, 18°C a 28°C verde, 29°C a 35°C amarillo, > 35°C rojo.",
+    evaluar(v) {
+      if (v < 10) return ["rojo", "Crítico (temperatura muy baja)"];
+      if (v <= 17) return ["amarillo", "Advertencia (temperatura baja)"];
+      if (v <= 28) return ["verde", "Normal"];
+      if (v <= 35) return ["amarillo", "Advertencia (temperatura alta)"];
+      return ["rojo", "Crítico (temperatura muy alta)"];
+    }
+  },
+  {
+    id: "luz",
+    nombre: "Sensor de luz ambiental",
+    badge: "Adicional",
+    badgeClass: "secondary",
+    unidad: "%",
+    min: 0,
+    max: 100,
+    valor: 60,
+    control: "Modificar luz ambiental",
+    regla: "≤ 20% rojo, 21% a 50% amarillo, > 50% verde.",
+    evaluar(v) {
+      if (v <= 20) return ["rojo", "Crítico (iluminación muy baja)"];
+      if (v <= 50) return ["amarillo", "Advertencia (iluminación media)"];
+      return ["verde", "Adecuado"];
+    }
+  },
+  {
+    id: "nivel",
+    nombre: "Sensor de nivel de agua del tanque",
+    badge: "Adicional",
+    badgeClass: "secondary",
+    unidad: "%",
+    min: 0,
+    max: 100,
+    valor: 70,
+    control: "Modificar nivel de agua del tanque",
+    regla: "≤ 20% rojo, 21% a 50% amarillo, > 50% verde.",
+    evaluar(v) {
+      if (v <= 20) return ["rojo", "Crítico (tanque casi vacío)"];
+      if (v <= 50) return ["amarillo", "Advertencia (nivel medio)"];
+      return ["verde", "Correcto"];
+    }
+  },
+  {
+    id: "proximidad",
+    nombre: "Sensor de proximidad de objeto",
+    badge: "Adicional",
+    badgeClass: "secondary",
+    unidad: "cm",
+    min: 0,
+    max: 100,
+    valor: 40,
+    control: "Modificar proximidad",
+    regla: "≤ 10 cm rojo, 11 cm a 25 cm amarillo, > 25 cm verde.",
+    evaluar(v) {
+      if (v <= 10) return ["rojo", "Crítico (objeto muy cerca)"];
+      if (v <= 25) return ["amarillo", "Advertencia (objeto cercano)"];
+      return ["verde", "Distancia segura"];
+    }
+  }
+];
+
+/* =========================================
+   CAMBIAR COLOR DEL LED
 ========================================= */
 function ponerLed(led, color) {
-  limpiarLed(led);
+  led.className = `led ${
+    color === "rojo" ? "led-red" :
+    color === "amarillo" ? "led-yellow" :
+    color === "verde" ? "led-green" :
+    "led-off"
+  }`;
+}
 
-  if (color === "rojo") {
-    led.classList.add("led-red");
-  } else if (color === "amarillo") {
-    led.classList.add("led-yellow");
-  } else if (color === "verde") {
-    led.classList.add("led-green");
+/* =========================================
+   ACTUALIZAR LA HORA EN PANTALLA
+========================================= */
+function actualizarHora() {
+  horaActual.textContent = new Date().toLocaleTimeString();
+}
+
+/* =========================================
+   CREAR LAS TARJETAS DE LOS SENSORES
+   Se generan automáticamente desde el arreglo
+========================================= */
+function crearInterfaz() {
+  cardsGrid.innerHTML = sensores.map(s => `
+    <article class="sensor-card">
+      <div class="card-top">
+        <h3>${s.nombre}</h3>
+        <span class="badge ${s.badgeClass}">${s.badge}</span>
+      </div>
+
+      <div class="sensor-value">
+        <span id="${s.id}Valor">${s.valor}</span><small>${s.unidad}</small>
+      </div>
+
+      <div class="control-box">
+        <label for="${s.id}Range">${s.control}</label>
+        <input type="range" id="${s.id}Range" min="${s.min}" max="${s.max}" value="${s.valor}">
+      </div>
+
+      <div class="control-box">
+        <label for="${s.id}Input">Valor manual</label>
+        <input type="number" id="${s.id}Input" min="${s.min}" max="${s.max}" value="${s.valor}">
+      </div>
+
+      <div class="led-info">
+        <div class="led led-off" id="led${cap(s.id)}"></div>
+        <div>
+          <p class="led-title">LED de ${s.nombre.toLowerCase().replace("sensor de ", "")}</p>
+          <p class="led-state" id="estado${cap(s.id)}">Estado: --</p>
+        </div>
+      </div>
+    </article>
+  `).join("");
+
+  logicList.innerHTML = sensores
+    .map(s => `<li><strong>${s.nombre}:</strong> ${s.regla}</li>`)
+    .join("");
+}
+
+/* =========================================
+   ACTUALIZAR UN SENSOR
+   - Toma su valor actual
+   - Cambia número mostrado
+   - Cambia LED
+   - Cambia texto del estado
+========================================= */
+function actualizarSensor(s) {
+  const v = +$(s.id + "Range").value;
+
+  $(s.id + "Input").value = v;
+  $(s.id + "Valor").textContent = v;
+
+  const [color, texto] = s.evaluar(v);
+
+  ponerLed($("led" + cap(s.id)), color);
+  $("estado" + cap(s.id)).textContent = "Estado: " + texto;
+
+  return color;
+}
+
+/* =========================================
+   ACTUALIZAR RESUMEN GENERAL
+========================================= */
+function actualizarResumen(estados) {
+  const normales = estados.filter(e => e === "verde").length;
+  const advertencia = estados.filter(e => e === "amarillo").length;
+  const criticos = estados.filter(e => e === "rojo").length;
+
+  totalSensores.textContent = estados.length;
+  totalNormales.textContent = normales;
+  totalAdvertencia.textContent = advertencia;
+  totalCriticos.textContent = criticos;
+
+  if (criticos) {
+    estadoGeneral.textContent = "Alerta del sistema";
+    descripcionGeneral.textContent =
+      "Se detectó al menos una condición crítica en los sensores. Es necesario revisar los valores mostrados y tomar acciones correctivas.";
+  } else if (advertencia) {
+    estadoGeneral.textContent = "Sistema en advertencia";
+    descripcionGeneral.textContent =
+      "Uno o más sensores se encuentran en una condición intermedia que requiere atención.";
   } else {
-    led.classList.add("led-off");
+    estadoGeneral.textContent = "Operación normal";
+    descripcionGeneral.textContent =
+      "Todos los sensores se encuentran en rangos adecuados y el sistema opera correctamente.";
   }
 }
 
 /* =========================================
-   ACTUALIZAR HORA
+   ACTUALIZAR TODO EL SISTEMA
 ========================================= */
-function actualizarHora() {
-  const ahora = new Date();
-  horaActual.textContent = ahora.toLocaleTimeString();
+function actualizarTodo() {
+  const estados = sensores.map(s => actualizarSensor(s));
+  actualizarResumen(estados);
+  actualizarHora();
 }
 
 /* =========================================
-   LOGIN
+   VINCULAR LOS SLIDERS Y LOS INPUTS
+   Cuando cambias uno, se actualiza el otro
+========================================= */
+function enlazarControles() {
+  sensores.forEach(s => {
+    const range = $(s.id + "Range");
+    const input = $(s.id + "Input");
+
+    range.addEventListener("input", () => {
+      input.value = range.value;
+      actualizarTodo();
+    });
+
+    input.addEventListener("input", () => {
+      const v = limitar(input.value, s.min, s.max);
+      input.value = v;
+      range.value = v;
+      actualizarTodo();
+    });
+  });
+}
+
+/* =========================================
+   INICIAR SESIÓN
 ========================================= */
 function iniciarSesion() {
   const usuario = usuarioInput.value.trim();
@@ -152,289 +308,68 @@ function iniciarSesion() {
   }
 }
 
-btnLogin.addEventListener("click", iniciarSesion);
-
-usuarioInput.addEventListener("keypress", function (event) {
-  if (event.key === "Enter") {
-    iniciarSesion();
-  }
-});
-
-contrasenaInput.addEventListener("keypress", function (event) {
-  if (event.key === "Enter") {
-    iniciarSesion();
-  }
-});
-
 /* =========================================
    CERRAR SESIÓN
 ========================================= */
-btnLogout.addEventListener("click", function () {
+function cerrarSesion() {
   dashboardSection.classList.remove("active");
   loginSection.classList.add("active");
 
   usuarioInput.value = "";
   contrasenaInput.value = "";
   mensajeLogin.textContent = "";
-});
+}
 
 /* =========================================
-   SINCRONIZAR SLIDER Y INPUT
+   GENERAR VALORES ALEATORIOS
 ========================================= */
-function sincronizarControles(range, input, minimo, maximo) {
-  range.addEventListener("input", function () {
-    input.value = range.value;
-    actualizarTodo();
+function aleatorio() {
+  sensores.forEach(s => {
+    const v = random(s.min, s.max);
+    $(s.id + "Range").value = v;
+    $(s.id + "Input").value = v;
   });
 
-  input.addEventListener("input", function () {
-    if (input.value !== "") {
-      const valor = limitarValor(input.value, minimo, maximo);
-      input.value = valor;
-      range.value = valor;
-      actualizarTodo();
-    }
+  actualizarTodo();
+}
+
+/* =========================================
+   RESTABLECER VALORES ORIGINALES
+========================================= */
+function resetear() {
+  sensores.forEach(s => {
+    $(s.id + "Range").value = s.valor;
+    $(s.id + "Input").value = s.valor;
   });
-}
-
-sincronizarControles(humedadRange, humedadInput, 0, 100);
-sincronizarControles(temperaturaRange, temperaturaInput, 0, 50);
-sincronizarControles(luzRange, luzInput, 0, 100);
-sincronizarControles(nivelRange, nivelInput, 0, 100);
-sincronizarControles(proximidadRange, proximidadInput, 0, 100);
-
-/* =========================================
-   HUMEDAD
-========================================= */
-function actualizarHumedad() {
-  const humedad = parseInt(humedadRange.value);
-  humedadValor.textContent = humedad;
-
-  if (humedad <= 8) {
-    ponerLed(ledHumedad, "rojo");
-    estadoHumedad.textContent = "Estado: Crítico (humedad muy baja)";
-    return "rojo";
-  } else if (humedad <= 20) {
-    ponerLed(ledHumedad, "amarillo");
-    estadoHumedad.textContent = "Estado: Advertencia (humedad baja)";
-    return "amarillo";
-  } else {
-    ponerLed(ledHumedad, "verde");
-    estadoHumedad.textContent = "Estado: Estable";
-    return "verde";
-  }
-}
-
-/* =========================================
-   TEMPERATURA
-========================================= */
-function actualizarTemperatura() {
-  const temperatura = parseInt(temperaturaRange.value);
-  temperaturaValor.textContent = temperatura;
-
-  if (temperatura < 10) {
-    ponerLed(ledTemperatura, "rojo");
-    estadoTemperatura.textContent = "Estado: Crítico (temperatura muy baja)";
-    return "rojo";
-  } else if (temperatura <= 17) {
-    ponerLed(ledTemperatura, "amarillo");
-    estadoTemperatura.textContent = "Estado: Advertencia (temperatura baja)";
-    return "amarillo";
-  } else if (temperatura <= 28) {
-    ponerLed(ledTemperatura, "verde");
-    estadoTemperatura.textContent = "Estado: Normal";
-    return "verde";
-  } else if (temperatura <= 35) {
-    ponerLed(ledTemperatura, "amarillo");
-    estadoTemperatura.textContent = "Estado: Advertencia (temperatura alta)";
-    return "amarillo";
-  } else {
-    ponerLed(ledTemperatura, "rojo");
-    estadoTemperatura.textContent = "Estado: Crítico (temperatura muy alta)";
-    return "rojo";
-  }
-}
-
-/* =========================================
-   LUZ
-========================================= */
-function actualizarLuz() {
-  const luz = parseInt(luzRange.value);
-  luzValor.textContent = luz;
-
-  if (luz <= 20) {
-    ponerLed(ledLuz, "rojo");
-    estadoLuz.textContent = "Estado: Crítico (iluminación muy baja)";
-    return "rojo";
-  } else if (luz <= 50) {
-    ponerLed(ledLuz, "amarillo");
-    estadoLuz.textContent = "Estado: Advertencia (iluminación media)";
-    return "amarillo";
-  } else {
-    ponerLed(ledLuz, "verde");
-    estadoLuz.textContent = "Estado: Adecuado";
-    return "verde";
-  }
-}
-
-/* =========================================
-   NIVEL DE AGUA
-========================================= */
-function actualizarNivelAgua() {
-  const nivel = parseInt(nivelRange.value);
-  nivelValor.textContent = nivel;
-
-  if (nivel <= 20) {
-    ponerLed(ledNivel, "rojo");
-    estadoNivel.textContent = "Estado: Crítico (tanque casi vacío)";
-    return "rojo";
-  } else if (nivel <= 50) {
-    ponerLed(ledNivel, "amarillo");
-    estadoNivel.textContent = "Estado: Advertencia (nivel medio)";
-    return "amarillo";
-  } else {
-    ponerLed(ledNivel, "verde");
-    estadoNivel.textContent = "Estado: Correcto";
-    return "verde";
-  }
-}
-
-/* =========================================
-   PROXIMIDAD
-========================================= */
-function actualizarProximidad() {
-  const proximidad = parseInt(proximidadRange.value);
-  proximidadValor.textContent = proximidad;
-
-  if (proximidad <= 10) {
-    ponerLed(ledProximidad, "rojo");
-    estadoProximidad.textContent = "Estado: Crítico (objeto muy cerca)";
-    return "rojo";
-  } else if (proximidad <= 25) {
-    ponerLed(ledProximidad, "amarillo");
-    estadoProximidad.textContent = "Estado: Advertencia (objeto cercano)";
-    return "amarillo";
-  } else {
-    ponerLed(ledProximidad, "verde");
-    estadoProximidad.textContent = "Estado: Distancia segura";
-    return "verde";
-  }
-}
-
-/* =========================================
-   ACTUALIZAR TARJETAS DE RESUMEN
-========================================= */
-function actualizarTarjetasResumen(estados) {
-  let normales = 0;
-  let advertencia = 0;
-  let criticos = 0;
-
-  for (let i = 0; i < estados.length; i++) {
-    if (estados[i] === "verde") {
-      normales++;
-    } else if (estados[i] === "amarillo") {
-      advertencia++;
-    } else if (estados[i] === "rojo") {
-      criticos++;
-    }
-  }
-
-  totalSensores.textContent = estados.length;
-  totalNormales.textContent = normales;
-  totalAdvertencia.textContent = advertencia;
-  totalCriticos.textContent = criticos;
-}
-
-/* =========================================
-   ESTADO GENERAL DEL SISTEMA
-========================================= */
-function actualizarEstadoGeneral(estados) {
-  if (estados.includes("rojo")) {
-    estadoGeneral.textContent = "Alerta del sistema";
-    descripcionGeneral.textContent =
-      "Se detectó al menos una condición crítica en los sensores. Es necesario revisar los valores mostrados y tomar acciones correctivas.";
-  } else if (estados.includes("amarillo")) {
-    estadoGeneral.textContent = "Sistema en advertencia";
-    descripcionGeneral.textContent =
-      "Uno o más sensores se encuentran en una condición intermedia que requiere atención.";
-  } else {
-    estadoGeneral.textContent = "Operación normal";
-    descripcionGeneral.textContent =
-      "Todos los sensores se encuentran en rangos adecuados y el sistema opera correctamente.";
-  }
-}
-
-/* =========================================
-   BOTÓN ALEATORIO
-========================================= */
-btnAleatorio.addEventListener("click", function () {
-  const humedadRandom = Math.floor(Math.random() * 101);
-  const temperaturaRandom = Math.floor(Math.random() * 51);
-  const luzRandom = Math.floor(Math.random() * 101);
-  const nivelRandom = Math.floor(Math.random() * 101);
-  const proximidadRandom = Math.floor(Math.random() * 101);
-
-  humedadRange.value = humedadRandom;
-  humedadInput.value = humedadRandom;
-
-  temperaturaRange.value = temperaturaRandom;
-  temperaturaInput.value = temperaturaRandom;
-
-  luzRange.value = luzRandom;
-  luzInput.value = luzRandom;
-
-  nivelRange.value = nivelRandom;
-  nivelInput.value = nivelRandom;
-
-  proximidadRange.value = proximidadRandom;
-  proximidadInput.value = proximidadRandom;
 
   actualizarTodo();
+}
+
+/* =========================================
+   EVENTOS DE BOTONES
+========================================= */
+btnLogin.addEventListener("click", iniciarSesion);
+btnLogout.addEventListener("click", cerrarSesion);
+btnAleatorio.addEventListener("click", aleatorio);
+btnReset.addEventListener("click", resetear);
+
+/* =========================================
+   PERMITIR ENTER EN EL LOGIN
+========================================= */
+[usuarioInput, contrasenaInput].forEach(input => {
+  input.addEventListener("keypress", e => {
+    if (e.key === "Enter") iniciarSesion();
+  });
 });
 
 /* =========================================
-   BOTÓN RESET
+   INICIALIZACIÓN DEL SISTEMA
 ========================================= */
-btnReset.addEventListener("click", function () {
-  humedadRange.value = 45;
-  humedadInput.value = 45;
-
-  temperaturaRange.value = 24;
-  temperaturaInput.value = 24;
-
-  luzRange.value = 60;
-  luzInput.value = 60;
-
-  nivelRange.value = 70;
-  nivelInput.value = 70;
-
-  proximidadRange.value = 40;
-  proximidadInput.value = 40;
-
-  actualizarTodo();
-});
-
-/* =========================================
-   ACTUALIZAR TODO
-========================================= */
-function actualizarTodo() {
-  const estado1 = actualizarHumedad();
-  const estado2 = actualizarTemperatura();
-  const estado3 = actualizarLuz();
-  const estado4 = actualizarNivelAgua();
-  const estado5 = actualizarProximidad();
-
-  const estados = [estado1, estado2, estado3, estado4, estado5];
-
-  actualizarEstadoGeneral(estados);
-  actualizarTarjetasResumen(estados);
-  actualizarHora();
-}
+crearInterfaz();
+enlazarControles();
+actualizarTodo();
 
 /* =========================================
    RELOJ AUTOMÁTICO
 ========================================= */
 setInterval(actualizarHora, 1000);
-
-/* Inicialización */
-actualizarTodo();
