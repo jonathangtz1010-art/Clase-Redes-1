@@ -14,17 +14,13 @@
   --bg-main: #07111f;
   --bg-card: rgba(16, 27, 46, 0.78);
   --line: rgba(255, 255, 255, 0.08);
-
   --text: #f4f7fb;
   --text-soft: #aab7cf;
-
   --primary: #4da3ff;
   --primary-2: #7b61ff;
-
   --success: #22c55e;
   --warning: #facc15;
   --danger: #ef4444;
-
   --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
 }
 
@@ -92,8 +88,6 @@ body {
 
 /* =========================
    LOGIN
-   OJO: así sí se oculta correctamente
-   cuando quitas la clase active
 ========================= */
 #loginSection {
   min-height: 100vh;
@@ -317,7 +311,8 @@ body {
 .sensor-card,
 .summary-card,
 .legend-card,
-.logic-card {
+.logic-card,
+.stat-card {
   background: rgba(255,255,255,0.04);
   border: 1px solid var(--line);
   border-radius: 20px;
@@ -474,10 +469,12 @@ body {
   color: var(--text-soft);
   font-size: 0.92rem;
   margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .summary-card h3 {
-  font-size: 1.45rem;
+  font-size: 1.9rem;
   margin-bottom: 10px;
 }
 
@@ -486,6 +483,38 @@ body {
   line-height: 1.55;
 }
 
+/* =========================
+   TARJETAS DE RESUMEN
+========================= */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.stat-card {
+  min-height: 110px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: rgba(255,255,255,0.05);
+}
+
+.stat-number {
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #f4f7fb;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  color: #9db4da;
+  font-size: 0.95rem;
+}
+
+/* =========================
+   LEYENDA Y LÓGICA
+========================= */
 .legend-card h3,
 .logic-card h3 {
   margin-bottom: 14px;
@@ -557,5 +586,9 @@ body {
 
   .sensor-value {
     font-size: 2.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
 }
